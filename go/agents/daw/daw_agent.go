@@ -99,8 +99,9 @@ func (a *DawAgent) GenerateActions(
 		request.CFGGrammar = &llm.CFGConfig{
 			ToolName: "magda_dsl",
 			Description: "Executes REAPER operations using the MAGDA DSL. " +
-				"Generate functional script code like: track(instrument=\"Serum\").newClip(bar=3, length_bars=4).addMidi(notes=[...]). " +
-				"For existing tracks, use .newClip(track=1, bar=3) where track is 1-based (track 1 = first track). " +
+				"Generate functional script code like: track(instrument=\"Serum\").new_clip(bar=3, length_bars=4).add_midi(notes=[...]). " +
+				"For existing tracks, use track(id=1).new_clip(bar=3) where id is 1-based (track 1 = first track). " +
+				"Use functional methods for collections: filter(tracks, track.name == \"FX\"), map(@get_name, tracks), for_each(tracks, @add_reverb). " +
 				"ALWAYS check the current REAPER state to see which tracks exist and use the correct track indices. " +
 				"If no track is specified in a chain, it applies to the track created by track(). " +
 				"YOU MUST REASON HEAVILY ABOUT THE OPERATIONS AND MAKE SURE THE CODE OBEYS THE GRAMMAR.",
@@ -206,11 +207,14 @@ func (a *DawAgent) parseActionsFromResponse(resp *llm.GenerationResponse, state 
 	if a.useDSL {
 		dslCode := strings.TrimSpace(resp.RawOutput)
 		// Check if it's DSL (starts with "track" or similar function call)
-		if strings.HasPrefix(dslCode, "track(") || strings.Contains(dslCode, ".newClip(") || strings.Contains(dslCode, ".addMidi(") {
+		if strings.HasPrefix(dslCode, "track(") || strings.Contains(dslCode, ".new_clip(") || strings.Contains(dslCode, ".add_midi(") || strings.Contains(dslCode, ".filter(") || strings.Contains(dslCode, ".map(") || strings.Contains(dslCode, ".for_each(") {
 			// This is DSL code - parse and translate to REAPER API actions
 			log.Printf("✅ Found DSL code in response: %s", truncate(dslCode, MaxDSLPreviewLength))
 
-			parser := NewDSLParser()
+			parser, err := NewFunctionalDSLParser()
+			if err != nil {
+				return nil, fmt.Errorf("failed to create functional DSL parser: %w", err)
+			}
 			parser.SetState(map[string]interface{}{"state": state}) // Pass state for track resolution
 			actions, err := parser.ParseDSL(dslCode)
 			if err != nil {
@@ -291,8 +295,9 @@ func (a *DawAgent) GenerateActionsStream(
 		request.CFGGrammar = &llm.CFGConfig{
 			ToolName: "magda_dsl",
 			Description: "Executes REAPER operations using the MAGDA DSL. " +
-				"Generate functional script code like: track(instrument=\"Serum\").newClip(bar=3, length_bars=4).addMidi(notes=[...]). " +
-				"For existing tracks, use .newClip(track=1, bar=3) where track is 1-based (track 1 = first track). " +
+				"Generate functional script code like: track(instrument=\"Serum\").new_clip(bar=3, length_bars=4).add_midi(notes=[...]). " +
+				"For existing tracks, use track(id=1).new_clip(bar=3) where id is 1-based (track 1 = first track). " +
+				"Use functional methods for collections: filter(tracks, track.name == \"FX\"), map(@get_name, tracks), for_each(tracks, @add_reverb). " +
 				"ALWAYS check the current REAPER state to see which tracks exist and use the correct track indices. " +
 				"If no track is specified in a chain, it applies to the track created by track(). " +
 				"YOU MUST REASON HEAVILY ABOUT THE OPERATIONS AND MAKE SURE THE CODE OBEYS THE GRAMMAR.",
@@ -380,19 +385,23 @@ func (a *DawAgent) parseActionsIncremental(text string, state map[string]interfa
 	// If using DSL mode, try parsing as DSL first
 	if a.useDSL {
 		// Check if it's DSL (starts with "track" or similar function call)
-		if strings.HasPrefix(text, "track(") || strings.Contains(text, ".newClip(") || strings.Contains(text, ".addMidi(") {
+		if strings.HasPrefix(text, "track(") || strings.Contains(text, ".new_clip(") || strings.Contains(text, ".add_midi(") || strings.Contains(text, ".filter(") || strings.Contains(text, ".map(") || strings.Contains(text, ".for_each(") {
 			// This is DSL code - parse and translate to REAPER API actions
 			log.Printf("✅ Found DSL code in stream: %s", truncate(text, MaxDSLPreviewLength))
 
-			parser := NewDSLParser()
-			parser.SetState(map[string]interface{}{"state": state}) // Pass state for track resolution
-			actions, err := parser.ParseDSL(text)
-			if err == nil && len(actions) > 0 {
-				log.Printf("✅ Translated DSL to %d REAPER API actions", len(actions))
-				return actions, nil
+			parser, err := NewFunctionalDSLParser()
+			if err != nil {
+				log.Printf("⚠️  Failed to create functional DSL parser: %v, trying JSON parse", err)
+			} else {
+				parser.SetState(map[string]interface{}{"state": state}) // Pass state for track resolution
+				actions, err := parser.ParseDSL(text)
+				if err == nil && len(actions) > 0 {
+					log.Printf("✅ Translated DSL to %d REAPER API actions", len(actions))
+					return actions, nil
+				}
+				// If DSL parsing failed, fall through to JSON parsing
+				log.Printf("⚠️  DSL parsing failed, trying JSON parse: %v", err)
 			}
-			// If DSL parsing failed, fall through to JSON parsing
-			log.Printf("⚠️  DSL parsing failed, trying JSON parse: %v", err)
 		}
 	}
 
