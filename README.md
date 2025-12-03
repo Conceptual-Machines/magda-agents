@@ -9,40 +9,35 @@ MAGDA Agents is the core framework that powers MAGDA's intelligent DAW control. 
 - **Plugin Agent**: Manages plugin discovery, deduplication, and alias generation
 - **Arranger Agent**: Handles musical arrangement and composition
 
-## Multi-Language Support
+## Language Implementations
 
-This framework is designed to be language-agnostic and provides implementations in:
+This framework is implemented in multiple languages. Each implementation provides the same core functionality:
 
-- **Go** (`go/`) - Primary implementation, production-ready
-- **Python** (`python/`) - Coming soon
-- **TypeScript** (`typescript/`) - Coming soon
+### Go Implementation ⭐ (Production Ready)
 
-Each language implementation provides the same core functionality and interfaces, allowing you to use MAGDA Agents in your preferred language.
+**Repository:** [magda-agents-go](https://github.com/Conceptual-Machines/magda-agents-go)
 
-## Architecture
-
+```bash
+go get github.com/Conceptual-Machines/magda-agents-go
 ```
-magda-agents/
-├── go/              # Go implementation
-├── python/           # Python implementation (scaffolding)
-├── typescript/       # TypeScript implementation (scaffolding)
-└── docs/             # Shared documentation
-```
-
-## Quick Start
-
-### Go
 
 ```go
 import (
-    "github.com/conceptual-machines/magda-agents/go/agents/daw"
+    "github.com/Conceptual-Machines/magda-agents-go/agents/daw"
+    "github.com/Conceptual-Machines/magda-agents-go/config"
 )
 
 agent := daw.NewDawAgent(cfg)
 result, err := agent.GenerateActions(ctx, question, state)
 ```
 
-### Python (Coming Soon)
+### Python Implementation 🐍
+
+**Repository:** [magda-agents-python](https://github.com/Conceptual-Machines/magda-agents-python)
+
+```bash
+pip install magda-agents
+```
 
 ```python
 from magda_agents.agents.daw import DawAgent
@@ -51,46 +46,24 @@ agent = DawAgent(cfg)
 result = agent.generate_actions(ctx, question, state)
 ```
 
-### TypeScript (Coming Soon)
+## Features
 
-```typescript
-import { DawAgent } from '@conceptual-machines/magda-agents';
-
-const agent = new DawAgent(cfg);
-const result = await agent.generateActions(ctx, question, state);
-```
-
-## Installation
-
-### Go
-
-```bash
-go get github.com/conceptual-machines/magda-agents/go/agents/daw
-```
-
-### Python (Coming Soon)
-
-```bash
-pip install magda-agents
-```
-
-### TypeScript (Coming Soon)
-
-```bash
-npm install @conceptual-machines/magda-agents
-```
-
-## License
-
-AGPL v3 - See [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- **Functional DSL Parser**: Supports `filter`, `map`, and `for_each` methods for collections
+- **Grammar School Integration**: Built on [Grammar School](https://github.com/Conceptual-Machines/grammar-school) for LLM-friendly DSL parsing
+- **Multiple LLM Providers**: OpenAI, Gemini support
+- **Streaming Support**: Real-time action generation
+- **REAPER Integration**: Direct translation to REAPER API actions
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Agent Interfaces](docs/INTERFACES.md)
-- [Multi-Language Guide](docs/MULTI_LANGUAGE.md)
+- [Multi-Language Architecture](docs/MULTI_LANGUAGE.md)
+- [DAW Agent Documentation](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/agents/daw)
+- [DSL Grammar Reference](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/llm)
 
+## Contributing
+
+Contributions welcome! Please see individual language repositories for contribution guidelines.
+
+## License
+
+AGPL v3 - See LICENSE file for details.
