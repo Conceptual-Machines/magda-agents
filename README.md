@@ -13,9 +13,9 @@ MAGDA Agents is the core framework that powers MAGDA's intelligent DAW control. 
 
 This framework is implemented in multiple languages. Each implementation provides the same core functionality:
 
-### Go Implementation ⭐ (Production Ready)
+### ⭐ Go Implementation (Production Ready)
 
-**Repository:** [magda-agents-go](https://github.com/Conceptual-Machines/magda-agents-go)
+**Repository:** [`magda-agents-go`](https://github.com/Conceptual-Machines/magda-agents-go)
 
 ```bash
 go get github.com/Conceptual-Machines/magda-agents-go
@@ -31,9 +31,9 @@ agent := daw.NewDawAgent(cfg)
 result, err := agent.GenerateActions(ctx, question, state)
 ```
 
-### Python Implementation 🐍
+### 🐍 Python Implementation
 
-**Repository:** [magda-agents-python](https://github.com/Conceptual-Machines/magda-agents-python)
+**Repository:** [`magda-agents-python`](https://github.com/Conceptual-Machines/magda-agents-python)
 
 ```bash
 pip install magda-agents
@@ -54,15 +54,25 @@ result = agent.generate_actions(ctx, question, state)
 - **Streaming Support**: Real-time action generation
 - **REAPER Integration**: Direct translation to REAPER API actions
 
+## Quick Links
+
+- **Go**: [`magda-agents-go`](https://github.com/Conceptual-Machines/magda-agents-go) - Production-ready Go implementation
+- **Python**: [`magda-agents-python`](https://github.com/Conceptual-Machines/magda-agents-python) - Python implementation
+- **Documentation**: See individual language repositories for detailed docs
+- **Grammar School**: [`grammar-school`](https://github.com/Conceptual-Machines/grammar-school) - DSL framework dependency
+
 ## Documentation
 
-- [Multi-Language Architecture](docs/MULTI_LANGUAGE.md)
 - [DAW Agent Documentation](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/agents/daw)
 - [DSL Grammar Reference](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/llm)
+- [Plugin Agent](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/agents/plugin)
+- [Arranger Agent](https://github.com/Conceptual-Machines/magda-agents-go/tree/main/agents/arranger)
 
 ## Contributing
 
-Contributions welcome! Please see individual language repositories for contribution guidelines.
+Contributions welcome! Please see individual language repositories for contribution guidelines:
+- [Go Contributing](https://github.com/Conceptual-Machines/magda-agents-go/blob/main/CONTRIBUTING.md)
+- [Python Contributing](https://github.com/Conceptual-Machines/magda-agents-python/blob/main/CONTRIBUTING.md)
 
 ## License
 
